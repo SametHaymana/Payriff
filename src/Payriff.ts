@@ -40,7 +40,7 @@ export enum ResultMessages {
 
 type methodType =   "cardSave" | "createOrder" | "getOrderInformation" | 
                     "getStatusOrder" | "refund" | "preAuth" | "reverse"|
-                    "completeOrder" | "autoPay" ;
+                    "completeOrder" | "autoPay" | "autoPay" | "invoices";
 
 type currencyType =  "AZN" | "USD" | "EUR";
 type languageType =  "AZ" | "EN" | "RU" ; 
@@ -61,7 +61,9 @@ type bodyType ={
     installmentPeriod?: number,
     installmentProductType?: string,
     orderId?: number,
-    sessionId?: string
+    sessionId?: string,
+    cardUuid?: string,
+    customMessage?: string
 
 }
 
@@ -231,10 +233,38 @@ export class Payriff{
     }
 
 
-    async autoPay(){
-        
+    async autoPay(amount: number, cardUuid: string, description: string,orderId: number, sessionId:string ){
+        const body : bodyType = {
+            amount,
+            description,
+            cardUuid,
+            orderId,
+            sessionId
+        }
+
+
+        return await this.sendRequest("autoPay", body)
+
     }
 
+    async invoices(amount: number,currencyType: currencyType,customMessage: string, description: string,
+        email: string){
+
+        const body : bodyType = {
+            amount,
+            approveURL : this.approveURL,
+            cancelURL : this.cancelURL,
+            declineURL: this.declineURL,
+            currencyType,
+            customMessage,
+            description,
+
+        }
+
+
+        return await this.sendRequest("autoPay", body)
+
+    }
 
 
 }
