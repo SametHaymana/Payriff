@@ -27,8 +27,9 @@ const payriff = new Payriff(
 
 payriff.createOrder(100,"AZN","EN")
 .then(response =>{
-    console.log(response)
+    console.log(response.payload.paymentUrl) // redirect user to this url for payment process
 })
+.catch(console.log)
 
 ```
 
