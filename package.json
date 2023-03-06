@@ -1,17 +1,24 @@
 {
   "name": "payriff",
   "version": "1.0.0",
-  "description": "",
+  "description": "The payment system mostly used in Azerbaijan is payriff. This package is an unofficial sdk of payriff payment system",
+  "author": "tomahawk",
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare" : "npm run build",
+    "version" : "git add -A src",
+    "postversion" : "git push && git push --tags"
+
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^1.3.4",
-    "tslint": "^6.1.3"
+    "axios": "^1.3.4"
+  },
+  "dependencies":{
+    "axios": "^1.3.4"
   },
   "devDependencies": {
     "typescript": "^4.9.5"

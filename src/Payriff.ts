@@ -1,75 +1,6 @@
 import axios from "axios"; 
-
-
-
-export enum ResultCodes {
-    SUCCESS = "00000",
-    SUCCESS_GATEWAY = "00",
-    SUCCESS_GATEWAY_APPROVE = "APPROVED",
-    SUCCESS_GATEWAY_PREAUTH_APPROVE = "PREAUTH-APPROVED",
-    WARNING = "01000",
-    ERROR = "15000",
-    INVALID_PARAMETERS = "15400",
-    UNAUTHORIZED = "14010",
-    TOKEN_NOT_PRESENT = "14013",
-    INVALID_TOKEN = "14014",
-}
-
-export enum ResultMessages {
-    OK = "OK",
-    SUCCESS = "Operation performed successfully",
-    ERROR = "Internal Error",
-    UNAUTHORIZED = "Unauthorized",
-    NOT_FOUND = "Not found",
-
-    TOKEN_NOT_PRESENT = "Token not present",
-    INVALID_TOKEN = "Invalid Token",
-    TOKEN_EXPIRED = "Token expired",
-    DEACTIVE_TOKEN = "Token is not active",
-    LINK_EXPIRED = "Link is expired!",
-
-    NO_RECORD_FOUND = "No record found!",
-    NO_INVOICE_FOUND = "No invoice found!",
-    APPLICATION_NOT_FOUND = "Application not found!",
-    USER_NOT_FOUND = "User not found!",
-    USER_ALREADY_EXISTS = "User already exists!",
-    UNEXPECTED_GATEWAY_ERROR = "Occurred problem with Processing",
-    INVALID_CREDENTIALS = "Username or Password is incorrect",
-}
-
-
-type methodType =   "cardSave" | "createOrder" | "getOrderInformation" | 
-                    "getStatusOrder" | "refund" | "preAuth" | "reverse"|
-                    "completeOrder" | "autoPay" | "autoPay" | "invoices";
-
-type currencyType =  "AZN" | "USD" | "EUR";
-type languageType =  "AZ" | "EN" | "RU" ; 
-
-
-type bodyType ={
-    amount?: number,
-    refundAmount?: number,
-    approveURL?: string,
-    cancelURL?: string,
-    declineURL?: string,
-    currencyType?: currencyType,
-    description?: string,
-    language?: languageType,
-    languageType?: languageType,
-    directPay?: boolean,
-    senderCardUID?:string,
-    installmentPeriod?: number,
-    installmentProductType?: string,
-    orderId?: number,
-    sessionId?: string,
-    cardUuid?: string,
-    customMessage?: string
-
-}
-
-
-
-
+import {methodType, languageType, currencyType,bodyType} from "./constants";
+import {PayriffError} from "./errors"
 
 
 export class Payriff{
@@ -94,27 +25,30 @@ export class Payriff{
 
 
     private async sendRequest (method : methodType , body: bodyType ){
-        
-        
-
-        const res = await axios.post(
-            this.baseUrl + method,
-            {
-                body,
-                merchant : this.merchant 
-            },
-            {
-                headers:{
-                    Authorization: this.secret
+        try {
+            const res = await axios.post(
+                this.baseUrl + method,
+                {
+                    body,
+                    merchant : this.merchant 
+                },
+                {
+                    headers:{
+                        Authorization: this.secret
+                    }
                 }
-            }
-        )
+            )
 
+            return res.data;
 
+        } catch (error: any) {
+            error = error.response
+            throw new PayriffError(error.data.code ,error.data.message);
+   
+        }
 
-        return res.data;
+        
     }
-
 
 
 
@@ -248,7 +182,8 @@ export class Payriff{
     }
 
     async invoices(amount: number,currencyType: currencyType,customMessage: string, description: string,
-        email: string){
+        email: string, expireDate: Date, fullName: string, languageType: languageType, phoneNumber: string,
+        sendSms: boolean = true){
 
         const body : bodyType = {
             amount,
@@ -258,12 +193,45 @@ export class Payriff{
             currencyType,
             customMessage,
             description,
-
+            email,
+            expireDate,
+            fullName,
+            languageType,
+            phoneNumber,
+            sendSms
         }
 
 
-        return await this.sendRequest("autoPay", body)
+        return await this.sendRequest("invoices", body)
 
+    }
+
+    async getInvoice(uuid: string){
+        const body : bodyType={
+            uuid
+        }
+
+        return await this.sendRequest("get-invoice", body)
+    }
+
+    async transfer(toMerchant: string, amount: number,  description: string){
+        const body : bodyType={
+            toMerchant,
+            amount,
+            description
+        }
+
+        return await this.sendRequest("transfer", body)
+    }
+
+    async topup(phoneNumber: string, amount: number, description: string){
+        const body : bodyType={
+            phoneNumber,
+            amount,
+            description
+        }
+
+        return await this.sendRequest("topup", body)
     }
 
 

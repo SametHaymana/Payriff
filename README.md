@@ -17,9 +17,18 @@ npm install payriff
 const {Payriff} = require("payriff")
 
 
-const pay = new Payriff(
-
+const payriff = new Payriff(
+    "yourMerchant",
+    "yourSecret",
+    "approvalWebHookUrl",
+    "cancelWebHookUrl",
+    "declineWebHookUrl",
 )
+
+payriff.createOrder(100,"AZN","EN")
+.then(response =>{
+    console.log(response)
+})
 
 ```
 
