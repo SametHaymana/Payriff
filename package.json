@@ -1,10 +1,10 @@
 {
   "name": "payriff",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "The payment system mostly used in Azerbaijan is payriff. This package is an unofficial sdk of payriff payment system",
   "author": "",
   "main": "index.js",
-  "types":"types",
+  "types": "types",
   "scripts": {
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
