@@ -1,5 +1,4 @@
 
-
 export class PayriffError extends Error{
     public resultCode : string;
     constructor(resultCode : string, resultMessage: string){
